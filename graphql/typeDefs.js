@@ -10,11 +10,13 @@ const typeDefs = gql`
     getMealPlan(userId: ID!): [MealPlan]
     recipe(id: ID!): Recipe
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
+    getAllUsers: [User]
   }
 
   # MUTATIONS
   type Mutation {
     generateMealPlan(userId: ID!): GenerateMealPlan
+    createUser(name: String!, email: String!): CreateUserResponse
   }
 
   # TYPES
@@ -33,8 +35,14 @@ const typeDefs = gql`
     snackDistribution: Float
   }
 
+  type CreateUserResponse {
+    success: Boolean
+    message: String
+    user: User
+  }
+
   type User {
-    id: ID!
+    databaseId: String
     name: String
     email: String
     profile: Profile
