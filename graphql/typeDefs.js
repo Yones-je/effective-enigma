@@ -17,6 +17,18 @@ const typeDefs = gql`
   type Mutation {
     generateMealPlan(userId: ID!): GenerateMealPlan
     createUser(name: String!, email: String!): CreateUserResponse
+    # Creates AND updates profile
+    updateUserProfile(
+      userId: ID
+      birthdate: Date
+      biologicalSex: BiologicalSex
+      height: Float
+      startingWeight: Float
+      targetWeight: Float
+      activityLevel: ActivityLevel
+      weeklyWeightGoal: WeeklyWeightGoal
+      goalsOn: Boolean
+    ): UpdateUserResponse
   }
 
   # TYPES
@@ -39,6 +51,14 @@ const typeDefs = gql`
     success: Boolean
     message: String
     user: User
+  }
+
+  type UpdateUserResponse {
+    success: Boolean
+    dcig: Int
+    cd: Int
+    tdee: Int
+    bmr: Int
   }
 
   type User {

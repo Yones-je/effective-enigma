@@ -6,7 +6,7 @@ dotenv.config({ path: '../.env' });
 const dateScalar = new GraphQLScalarType({
   name: 'Date',
   parseValue(value) {
-    return new Date(value).toISOString();
+    return new Date(value).toISOString().substring(0, 10);
   },
 });
 
@@ -25,6 +25,32 @@ module.exports.resolvers = {
     createUser: (_, { name, email }, { dataSources }) => {
       return dataSources.suggesticUserAPI.createUser(name, email);
     },
+    updateUserProfile: (
+      _,
+      {
+        userId,
+        birthdate,
+        biologicalSex,
+        height,
+        startingWeight,
+        targetWeight,
+        activityLevel,
+        weeklyWeightGoal,
+        goalsOn,
+      },
+      { dataSources }
+    ) => {
+      const profile = {
+        birthdate,
+        biologicalSex,
+        height,
+        startingWeight,
+        targetWeight,
+        activityLevel,
+        weeklyWeightGoal,
+        goalsOn,
+      };
+      return dataSources.suggesticAPI.updateUserProfile(userId, profile);
+    },
   },
-  //My discord is frozen
 };

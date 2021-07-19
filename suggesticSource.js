@@ -45,6 +45,41 @@ class SuggesticSource extends RESTDataSource {
     super();
     this.baseURL = baseURL;
   }
+  async updateUserProfile(userId, profile) {
+    const results = await this.post(
+      '',
+      {
+        query: `mutation {
+        profileMacroGoalsSettings(
+          birthdate: "${profile.birthdate}"
+          biologicalSex: ${profile.biologicalSex}
+          height: ${profile.height}
+          startingWeight: ${profile.startingWeight}
+          targetWeight: ${profile.targetWeight}
+          weeklyWeightGoal: ${profile.weeklyWeightGoal}
+          activityLevel: ${profile.activityLevel}
+          goalsOn: ${profile.goalsOn}
+        ) {
+          success
+          bmr 
+          tdee 
+          cd
+          dcig 
+        }
+      }`,
+      },
+      {
+        headers: {
+          'Content-type': 'application/json',
+          // prettier-ignore
+          'Authorization': `Token ${apiKey}`,
+          'sg-user': userId,
+        },
+      }
+    );
+    console.log(results);
+    return results.data.profileMacroGoalsSettings;
+  }
 
   async getAllUsers() {
     const results = await this.post(
