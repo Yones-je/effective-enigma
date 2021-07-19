@@ -7,7 +7,7 @@ const typeDefs = gql`
   # QUERIES
   type Query {
     hello: String
-    mealPlan(userId: ID!): MealPlan
+    getMealPlan(userId: ID!): [MealPlan]
     recipe(id: ID!): Recipe
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
   }

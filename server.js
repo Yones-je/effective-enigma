@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const { typeDefs } = require('./graphql/typeDefs.js');
 const { resolvers } = require('./graphql/resolvers.js');
 const { ApolloServer } = require('apollo-server-express');
-const dataSource = require('./dataSource');
+const SuggesticSource = require('./suggesticSource');
 dotenv.config();
 
 const baseURL = process.env.API_URL;
@@ -15,7 +15,7 @@ const server = new ApolloServer({
   resolvers,
   dataSources: () => {
     return {
-      suggesticAPI: new SuggesticAPI(baseURL),
+      suggesticAPI: new SuggesticSource(),
     };
   },
 });
