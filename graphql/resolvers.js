@@ -17,7 +17,6 @@ const dateScalar = new GraphQLScalarType({
 module.exports.resolvers = {
   Date: dateScalar,
   Query: {
-    hello: () => 'Hello World!',
     getMealPlan: (_, { userId }, { dataSources }) => {
       return dataSources.suggesticAPI.getMealPlan(userId);
     },
@@ -64,6 +63,40 @@ module.exports.resolvers = {
       } catch (err) {
         mongoLog(err);
       }
+    },
+    generateMealPlan: async (
+      _,
+      {
+        userId,
+        addDays,
+        ignoreLock,
+        kcalLimit,
+        maxNumOfServings,
+        breakfastDistribution,
+        lunchDistribution,
+        dinnerDistribution,
+        snackDistribution,
+      },
+      { dataSources }
+    ) => {
+      const mealPlanOptions = {
+        addDays,
+        ignoreLock,
+        kcalLimit,
+        maxNumOfServings,
+        breakfastDistribution,
+        lunchDistribution,
+        dinnerDistribution,
+        snackDistribution,
+      };
+
+      let filteredOptions = Object.fromEntries(
+        Object.entries(mealPlanOptions).filter(([_, v]) => v != null)
+      );
+      return await dataSources.suggesticAPI.generateMealPlan(
+        userId,
+        filteredOptions
+      );
     },
     updateUserProfile: async (
       _,

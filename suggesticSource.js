@@ -1,5 +1,6 @@
 const { RESTDataSource } = require('apollo-datasource-rest');
 const dotenv = require('dotenv');
+const objectToString = require('./utils/objectToString');
 const { mongoLog, apiLog } = require('./utils/eventLogger');
 dotenv.config();
 
@@ -133,6 +134,37 @@ class SuggesticSource extends RESTDataSource {
     return results.data.users.edges.map(el => el.node);
   }
 
+  async generateMealPlan(userId, mealPlanOptions) {
+    const results = await this.post(
+      '',
+      {
+        query: `mutation {
+        generateMealPlan (
+          ${objectToString(mealPlanOptions)}
+      ) {
+        success
+        message
+      }
+    }`,
+      },
+      {
+        headers: {
+          //'Content-type': 'application/json',
+          Authorization: `Token ${apiKey}`,
+          'sg-user': userId,
+        },
+      }
+    );
+
+    if (!results.data.generateMealPlan.success) {
+      apiLog(results.data.generateMealPlan.message);
+    } else {
+      apiLog(`Created meal plan for ${userId}`);
+    }
+
+    return results.data.generateMealPlan;
+  }
+
   async getMealPlan(id) {
     const results = await this.post(
       '',
@@ -173,3 +205,18 @@ class SuggesticSource extends RESTDataSource {
 }
 
 module.exports = { SuggesticSource };
+
+/* ${
+  mealPlanOptions.addDays ? `addDays: ${mealPlanOptions.addDays}` : ''
+}
+${
+  mealPlanOptions.ignoreLock
+    ? `ignoreLock: ${mealPlanOptions.ignoreLock}`
+    : ''
+}
+kcalLimit: ${mealPlanOptions.kcalLimit},
+maxNumOfServings: ${mealPlanOptions.maxNumOfServings},
+breakfastDistribution: ${mealPlanOptions.breakfastDistribution},
+lunchDistribution: ${mealPlanOptions.lunchDistribution},
+dinnerDistribution: ${mealPlanOptions.dinnerDistribution},
+snackDistribution: ${mealPlanOptions.snackDistribution}, */

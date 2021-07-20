@@ -6,7 +6,6 @@ const typeDefs = gql`
 
   # QUERIES
   type Query {
-    hello: String
     getMealPlan(userId: ID!): [MealPlan]
     recipe(id: ID!): Recipe
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
@@ -16,16 +15,29 @@ const typeDefs = gql`
 
   # MUTATIONS
   type Mutation {
-    generateMealPlan(userId: ID!): GenerateMealPlan
+    generateMealPlan(
+      userId: ID!
+      addDays: Boolean
+      ignoreLock: Boolean
+      kcalLimit: Float
+      maxNumOfServings: Int
+      breakfastDistribution: Float
+      lunchDistribution: Float
+      dinnerDistribution: Float
+      snackDistribution: Float
+    ): GenerateMealPlanResponse
+
     createUser(
       name: String!
       email: String!
       password: String!
     ): CreateUserResponse
+
     deleteUser(userId: ID!): DeleteUserResponse
+
     # Creates AND updates profile
     updateUserProfile(
-      userId: ID
+      userId: ID!
       birthdate: Date
       biologicalSex: BiologicalSex
       height: Float
@@ -56,29 +68,19 @@ const typeDefs = gql`
     success: Boolean
   }
 
-  # TYPES
-  type GenerateMealPlan {
-    addDays: Boolean
-    ignoreLock: Boolean
-    includeFavorites: Boolean
-    repeat: Date
-    kcalLimit: Float
-    maxNumOfServings: Int
-    maxServingWeight: Int
-    minServingWeight: Int
-    breakfastDistribution: Float
-    lunchDistribution: Float
-    dinnerDistribution: Float
-    snackDistribution: Float
+  type GenerateMealPlanResponse {
+    success: Boolean
+    message: String
   }
 
+  # TYPES
   type User {
     databaseId: String
     name: String
     email: String
     password: String
     profile: Profile
-    mealplan: MealPlan
+    mealplanId: ID
   }
 
   type Profile {
@@ -98,6 +100,7 @@ const typeDefs = gql`
   }
 
   type MealPlan {
+    id: ID!
     day: Int
     date: Date
     calories: Float
