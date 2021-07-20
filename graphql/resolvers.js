@@ -1,5 +1,8 @@
 const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const { GraphQLScalarType } = require('graphql');
+const User = require('../db/models/userModel');
 
 dotenv.config({ path: '../.env' });
 
@@ -22,8 +25,26 @@ module.exports.resolvers = {
     },
   },
   Mutation: {
-    createUser: (_, { name, email }, { dataSources }) => {
-      return dataSources.suggesticUserAPI.createUser(name, email);
+    createUser: async (_, { name, email, password }, { dataSources }) => {
+      const suggesticUser = await dataSources.suggesticAPI.createUser(
+        name,
+        email
+      );
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const mongoUser = await new User({
+        databaseId: suggesticUser.user.databaseId,
+        name: suggesticUser.user.name,
+        email: suggesticUser.user.email,
+        password: hashedPassword,
+      }).save();
+
+      return suggesticUser;
+    },
+
+    deleteUser: (_, { userId }, { dataSources }) => {
+      return dataSources.suggesticAPI.deleteUser(userId);
     },
     updateUserProfile: (
       _,
