@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { GraphQLScalarType } = require('graphql');
 const User = require('../db/models/userModel');
+const MealPlan = require('../db/models/mealPlanModel');
 const { mongoLog, apiLog } = require('../utils/eventLogger');
 
 dotenv.config({ path: '../.env' });
@@ -16,10 +17,22 @@ const dateScalar = new GraphQLScalarType({
 
 module.exports.resolvers = {
   Date: dateScalar,
+  /*  MealPlan: {
+    saveMealPlanToDB: async (_, { userId, mp }) => {
+      await new MealPlan(mp).save();
+
+      mongoLog(`Mealplan saved to DB`);
+    },
+  }, */
   Query: {
-    getMealPlan: (_, { userId }, { dataSources }) => {
+    getMealPlanFromSuggestic: (_, { userId }, { dataSources }) => {
       return dataSources.suggesticAPI.getMealPlan(userId);
     },
+
+    /* getMealPlanFromDB: () => {
+      
+    } */
+
     getAllSuggesticUsers: (_, __, { dataSources }) => {
       return dataSources.suggesticAPI.getAllUsers();
     },
@@ -93,10 +106,23 @@ module.exports.resolvers = {
       let filteredOptions = Object.fromEntries(
         Object.entries(mealPlanOptions).filter(([_, v]) => v != null)
       );
-      return await dataSources.suggesticAPI.generateMealPlan(
+
+      const isGenerated = await dataSources.suggesticAPI.generateMealPlan(
         userId,
         filteredOptions
       );
+
+      if (isGenerated.success) {
+        const mealPlan = await dataSources.suggesticAPI.getMealPlan(userId);
+
+        await new MealPlan({ ...mealPlan, id: userId }).save();
+
+        mongoLog(`Saved mealplan to DB`);
+        // return mealplan
+        return isGenerated;
+      }
+
+      return isGenerated;
     },
     updateUserProfile: async (
       _,

@@ -36,10 +36,10 @@ class SuggesticSource extends RESTDataSource {
       }
     );
 
-    if (!results.data.createUser.sucess) {
+    if (!results.data.createUser.success) {
       apiLog(`Error creating user: ${results.data.createUser.message}`);
     } else {
-      apiLog(`Created user ${results.data.createUser}`);
+      apiLog(`Created user ${results.data.createUser.user.databaseId}`);
     }
 
     return results.data.createUser;
@@ -85,8 +85,8 @@ class SuggesticSource extends RESTDataSource {
     const results = await this.post(
       '',
       {
-        query: `mutation{
-        deleteMyProfile{
+        query: `mutation {
+        deleteMyProfile {
           success
         }
       }`,
@@ -139,13 +139,17 @@ class SuggesticSource extends RESTDataSource {
       '',
       {
         query: `mutation {
-        generateMealPlan (
-          ${objectToString(mealPlanOptions)}
-      ) {
-        success
-        message
-      }
-    }`,
+          generateMealPlan 
+            ${
+              Object.keys(mealPlanOptions).length
+                ? '(' + objectToString(mealPlanOptions) + ')'
+                : ''
+            }
+         {
+          success
+          message
+        }
+      }`,
       },
       {
         headers: {

@@ -6,7 +6,7 @@ const typeDefs = gql`
 
   # QUERIES
   type Query {
-    getMealPlan(userId: ID!): [MealPlan]
+    getMealPlanFromSuggestic(userId: ID!): [MealPlan]
     recipe(id: ID!): Recipe
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
     getAllSuggesticUsers: [User]

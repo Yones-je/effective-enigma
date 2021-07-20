@@ -5,5 +5,7 @@ const MealPlanSchema = new Schema({
   day: Number,
   date: Date,
   calories: Number,
-  meals: [String],
+  meals: [Object],
 });
+
+module.exports = model('MealPlan', MealPlanSchema);

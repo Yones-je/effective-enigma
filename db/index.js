@@ -1,4 +1,3 @@
-// const uri = "mongodb+srv://yay_admin:spYMxqeNWYusu2q@yay.tqpu7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const { mongoLog, apiLog } = require('../utils/eventLogger');
 const Mongoose = require('mongoose');
 
