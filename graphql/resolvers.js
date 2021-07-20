@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { GraphQLScalarType } = require('graphql');
 const User = require('../db/models/userModel');
+const { mongoLog, apiLog } = require('../utils/eventLogger');
 
 dotenv.config({ path: '../.env' });
 
@@ -20,8 +21,12 @@ module.exports.resolvers = {
     getMealPlan: (_, { userId }, { dataSources }) => {
       return dataSources.suggesticAPI.getMealPlan(userId);
     },
-    getAllUsers: (_, __, { dataSources }) => {
+    getAllSuggesticUsers: (_, __, { dataSources }) => {
       return dataSources.suggesticAPI.getAllUsers();
+    },
+    getAllDbUsers: async (_, __) => {
+      const users = await User.find();
+      return users;
     },
   },
   Mutation: {
@@ -31,22 +36,36 @@ module.exports.resolvers = {
         email
       );
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      if (suggesticUser.success) {
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-      const mongoUser = await new User({
-        databaseId: suggesticUser.user.databaseId,
-        name: suggesticUser.user.name,
-        email: suggesticUser.user.email,
-        password: hashedPassword,
-      }).save();
+        await new User({
+          databaseId: suggesticUser.user.databaseId,
+          name: suggesticUser.user.name,
+          email: suggesticUser.user.email,
+          password: hashedPassword,
+        }).save();
+
+        mongoLog(`Created user ${suggesticUser.user.databaseId}`);
+      }
 
       return suggesticUser;
     },
 
-    deleteUser: (_, { userId }, { dataSources }) => {
-      return dataSources.suggesticAPI.deleteUser(userId);
+    deleteUser: async (_, { userId }, { dataSources }) => {
+      try {
+        const isDeletedUser = await User.findOneAndDelete({
+          databaseId: userId,
+        });
+        if (!isDeletedUser) throw new Error(`Could not delete user ${userId}`);
+
+        mongoLog(`Deleted user ${userId}`);
+        return dataSources.suggesticAPI.deleteUser(userId);
+      } catch (err) {
+        mongoLog(err);
+      }
     },
-    updateUserProfile: (
+    updateUserProfile: async (
       _,
       {
         userId,
@@ -71,7 +90,27 @@ module.exports.resolvers = {
         weeklyWeightGoal,
         goalsOn,
       };
-      return dataSources.suggesticAPI.updateUserProfile(userId, profile);
+
+      try {
+        const updatedUser = await dataSources.suggesticAPI.updateUserProfile(
+          userId,
+          profile
+        );
+        if (!updatedUser) {
+          throw new Error(`Could not update user ${userId}`);
+        }
+        if (updatedUser.success) {
+          const update = { profile };
+          await User.findOneAndUpdate({ databaseId: userId }, update, {
+            new: true,
+          });
+          mongoLog(`Updated user ${userId}`);
+        }
+        return updatedUser;
+      } catch (err) {
+        mongoLog(err);
+        return err;
+      }
     },
   },
 };

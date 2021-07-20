@@ -10,13 +10,19 @@ const typeDefs = gql`
     getMealPlan(userId: ID!): [MealPlan]
     recipe(id: ID!): Recipe
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
-    getAllUsers: [User]
+    getAllSuggesticUsers: [User]
+    getAllDbUsers: [User!]!
   }
 
   # MUTATIONS
   type Mutation {
     generateMealPlan(userId: ID!): GenerateMealPlan
-    createUser(name: String!, email: String!): CreateUserResponse
+    createUser(
+      name: String!
+      email: String!
+      password: String!
+    ): CreateUserResponse
+    deleteUser(userId: ID!): DeleteUserResponse
     # Creates AND updates profile
     updateUserProfile(
       userId: ID
@@ -29,6 +35,25 @@ const typeDefs = gql`
       weeklyWeightGoal: WeeklyWeightGoal
       goalsOn: Boolean
     ): UpdateUserResponse
+  }
+
+  # RESPONSES
+  type CreateUserResponse {
+    success: Boolean
+    message: String
+    user: User
+  }
+
+  type UpdateUserResponse {
+    success: Boolean
+    dcig: Int
+    cd: Int
+    tdee: Int
+    bmr: Int
+  }
+
+  type DeleteUserResponse {
+    success: Boolean
   }
 
   # TYPES
@@ -47,24 +72,11 @@ const typeDefs = gql`
     snackDistribution: Float
   }
 
-  type CreateUserResponse {
-    success: Boolean
-    message: String
-    user: User
-  }
-
-  type UpdateUserResponse {
-    success: Boolean
-    dcig: Int
-    cd: Int
-    tdee: Int
-    bmr: Int
-  }
-
   type User {
     databaseId: String
     name: String
     email: String
+    password: String
     profile: Profile
     mealplan: MealPlan
   }
