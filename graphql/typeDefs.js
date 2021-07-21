@@ -6,7 +6,8 @@ const typeDefs = gql`
 
   # QUERIES
   type Query {
-    getMealPlanFromSuggestic(userId: ID!): [MealPlan]
+    getMealPlanFromDb(userId: ID!): MealPlan
+    getMealPlanFromSuggestic(userId: ID!): [MealPlanSuggestic]
     recipe(id: ID!): Recipe
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
     getAllSuggesticUsers: [User]
@@ -99,8 +100,19 @@ const typeDefs = gql`
     bmr: Int
   }
 
+  type MealPlanSuggestic {
+    day: Int
+    date: Date
+    calories: Float
+    meals: [Meal]
+  }
+
   type MealPlan {
     id: ID!
+    mealPlan: [DayPlan]
+  }
+
+  type DayPlan {
     day: Int
     date: Date
     calories: Float

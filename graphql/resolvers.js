@@ -29,9 +29,11 @@ module.exports.resolvers = {
       return dataSources.suggesticAPI.getMealPlan(userId);
     },
 
-    /* getMealPlanFromDB: () => {
-      
-    } */
+    getMealPlanFromDb: async (_, { userId }) => {
+      const mealplan = await MealPlan.findOne({ id: userId });
+      console.log(mealplan);
+      return mealplan;
+    },
 
     getAllSuggesticUsers: (_, __, { dataSources }) => {
       return dataSources.suggesticAPI.getAllUsers();
@@ -114,14 +116,15 @@ module.exports.resolvers = {
 
       if (isGenerated.success) {
         const mealPlan = await dataSources.suggesticAPI.getMealPlan(userId);
-
-        await new MealPlan({ ...mealPlan, id: userId }).save();
-
-        mongoLog(`Saved mealplan to DB`);
-        // return mealplan
-        return isGenerated;
+        const existingMealPlan = await MealPlan.findOne({ id: userId });
+        if (existingMealPlan) {
+          await MealPlan.findOneAndUpdate({ id: userId }, { mealPlan });
+          mongoLog(`Updated mealplan in DB`);
+        } else if (!existingMealPlan) {
+          await new MealPlan({ id: userId, mealPlan }).save();
+          mongoLog(`Saved mealplan to DB`);
+        }
       }
-
       return isGenerated;
     },
     updateUserProfile: async (

@@ -7,7 +7,6 @@ const { ApolloServer } = require('apollo-server-express');
 const { SuggesticSource } = require('./suggesticSource');
 
 dotenv.config();
-
 const port = process.env.PORT || 4000;
 
 const app = express();
