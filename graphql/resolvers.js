@@ -17,13 +17,6 @@ const dateScalar = new GraphQLScalarType({
 
 module.exports.resolvers = {
   Date: dateScalar,
-  /*  MealPlan: {
-    saveMealPlanToDB: async (_, { userId, mp }) => {
-      await new MealPlan(mp).save();
-
-      mongoLog(`Mealplan saved to DB`);
-    },
-  }, */
   Query: {
     getMealPlanFromSuggestic: (_, { userId }, { dataSources }) => {
       return dataSources.suggesticAPI.getMealPlan(userId);
@@ -41,6 +34,16 @@ module.exports.resolvers = {
     getAllDbUsers: async (_, __) => {
       const users = await User.find();
       return users;
+    },
+    LoginUserByEmail: async (_, { email, password }) => {
+      const user = await User.findOne({ email });
+      if (!user)
+        return { success: false, message: 'No account with that email exists' };
+
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid)
+        return { success: false, message: 'Email or Password is incorrect.' };
+      return { success: true, message: 'Welcome in', user };
     },
   },
   Mutation: {

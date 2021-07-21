@@ -12,6 +12,7 @@ const typeDefs = gql`
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
     getAllSuggesticUsers: [User]
     getAllDbUsers: [User!]!
+    LoginUserByEmail(email: String!, password: String!): LoginResponse
   }
 
   # MUTATIONS
@@ -51,6 +52,13 @@ const typeDefs = gql`
   }
 
   # RESPONSES
+
+  type LoginResponse {
+    success: Boolean
+    message: String
+    user: User
+  }
+
   type CreateUserResponse {
     success: Boolean
     message: String
