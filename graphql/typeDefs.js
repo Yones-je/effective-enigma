@@ -147,7 +147,7 @@ const typeDefs = gql`
     parsedIngredientLines: IngredientLine
     courses: [String]
     cuisines: [String]
-    mealTags: String
+    mealTags: [String]
     source: Source
     mainImage: String
     isUserFavorite: Boolean

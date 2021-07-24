@@ -184,10 +184,33 @@ class SuggesticSource extends RESTDataSource {
                 meal
                 numOfServings
                 recipe {
+                  id
+                  databaseId
                   name
                   numberOfServings
+                  ingredientsCount
+                  ingredientLines
+                  courses
+                  cuisines
+                  mealTags
+                  source {
+                    recipeUrl
+                  }
+                  mainImage
+                  instructions
+                  totalTime
                   nutrientsPerServing {
                     calories
+                    sugar
+                    fiber
+                    protein
+                    carbs
+                    fat
+                  }
+                  caloriesPerServing {
+                    protein
+                    carbs
+                    fat
                   }
                 }
               }

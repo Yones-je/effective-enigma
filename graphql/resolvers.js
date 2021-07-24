@@ -4,8 +4,9 @@ const bcrypt = require('bcryptjs');
 const { GraphQLScalarType } = require('graphql');
 const User = require('../db/models/userModel');
 const MealPlan = require('../db/models/mealPlanModel');
+const Recipe = require('../db/models/recipeModel');
 const { mongoLog, apiLog } = require('../utils/eventLogger');
-
+const extractRecipes = require('../utils/extractRecipes');
 dotenv.config({ path: '../.env' });
 
 const dateScalar = new GraphQLScalarType({
@@ -127,6 +128,13 @@ module.exports.resolvers = {
           await new MealPlan({ id: userId, mealPlan }).save();
           mongoLog(`Saved mealplan to DB`);
         }
+        const recipes = extractRecipes(mealPlan);
+        const dbRecipes = await Recipe.find({}, 'id');
+        const existingIds = dbRecipes.map(r => r.id);
+
+        recipes.forEach(async recipe => {
+          if (!existingIds.includes(recipe.id)) await new Recipe(recipe).save();
+        });
       }
       return isGenerated;
     },
