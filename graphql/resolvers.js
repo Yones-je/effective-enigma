@@ -46,6 +46,10 @@ module.exports.resolvers = {
         return { success: false, message: 'Email or Password is incorrect.' };
       return { success: true, message: 'Welcome in', user };
     },
+    getRecipeFromDb: async (_, { id }) => {
+      const recipe = await Recipe.findOne({ id });
+      return recipe;
+    },
   },
   Mutation: {
     createUser: async (_, { name, email, password }, { dataSources }) => {
@@ -184,6 +188,27 @@ module.exports.resolvers = {
         mongoLog(err);
         return err;
       }
+    },
+    addRecipeToFavorites: async (_, { recipeId, userId }) => {
+      await User.findOneAndUpdate(
+        { id: userId },
+        // prettier-ignore
+        { "$push": { "favoriteRecipes": recipeId } }
+      );
+      return {
+        success: true,
+        message: `Added recipe: ${recipeId} to user: ${userId}'s favorites`,
+      };
+    },
+    removeRecipeFromFavorites: async (_, { recipeId, userId }) => {
+      await User.findOneAndUpdate(
+        { id: userId },
+        { $pull: { favoriteRecipes: recipeId } }
+      );
+      return {
+        success: true,
+        message: `Removed recipe: ${recipeId} from user: ${userId}'s favorites`,
+      };
     },
   },
 };

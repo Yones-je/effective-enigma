@@ -8,7 +8,8 @@ const typeDefs = gql`
   type Query {
     getMealPlanFromDb(userId: ID!): MealPlan
     getMealPlanFromSuggestic(userId: ID!): [MealPlanSuggestic]
-    recipe(id: ID!): Recipe
+    getRecipeFromDb(id: ID!): Recipe
+
     recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
     getAllSuggesticUsers: [User]
     getAllDbUsers: [User!]!
@@ -37,6 +38,9 @@ const typeDefs = gql`
 
     deleteUser(userId: ID!): DeleteUserResponse
 
+    addRecipeToFavorites(recipeId: ID!, userId: ID!): FavoriteResponse
+    removeRecipeFromFavorites(recipeId: ID!, userID: ID!): FavoriteResponse
+
     # Creates AND updates profile
     updateUserProfile(
       userId: ID!
@@ -57,6 +61,11 @@ const typeDefs = gql`
     success: Boolean
     message: String
     user: User
+  }
+
+  type FavoriteResponse {
+    success: Boolean
+    message: String
   }
 
   type CreateUserResponse {
