@@ -255,7 +255,6 @@ module.exports.resolvers = {
         user.restrictions
       );
     },
-
     swapMealPlanRecipe: async (
       _,
       { recipeId, mealId, userId },
