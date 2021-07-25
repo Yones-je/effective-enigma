@@ -25,7 +25,7 @@ module.exports.resolvers = {
 
     getMealPlanFromDb: async (_, { userId }) => {
       const mealplan = await MealPlan.findOne({ id: userId });
-      console.log(mealplan);
+      // console.log(mealplan);
       return mealplan;
     },
 
@@ -49,6 +49,20 @@ module.exports.resolvers = {
     getRecipeFromDb: async (_, { id }) => {
       const recipe = await Recipe.findOne({ id });
       return recipe;
+    },
+    recipeSwapOptions: async (_, { userId, recipeId }, { dataSources }) => {
+      const swappedRecipes = await dataSources.suggesticAPI.recipeSwapOptions(
+        userId,
+        recipeId
+      );
+      const dbRecipes = await Recipe.find({}, 'id');
+      const existingIds = dbRecipes.map(r => r.id);
+      swappedRecipes.forEach(async recipe => {
+        if (!existingIds.includes(recipe.id)) {
+          await new Recipe(recipe).save();
+        }
+      });
+      return swappedRecipes;
     },
   },
   Mutation: {

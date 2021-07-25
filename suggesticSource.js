@@ -169,53 +169,108 @@ class SuggesticSource extends RESTDataSource {
     return results.data.generateMealPlan;
   }
 
+  async recipeSwapOptions(userId, recipeId) {
+    const results = await this.post(
+      '',
+      {
+        query: `
+        {
+          recipeSwapOptions(
+            recipeId: "${recipeId}"
+          ) {
+            similar{
+              id
+                databaseId
+                name
+                numberOfServings
+                ingredientsCount
+                ingredientLines
+                courses
+                cuisines
+                mealTags
+                source {
+                  recipeUrl
+                }
+                mainImage
+                instructions
+                totalTime
+                nutrientsPerServing {
+                  calories
+                  sugar
+                  fiber
+                  protein
+                  carbs
+                  fat
+                }
+                caloriesPerServing {
+                  protein
+                  carbs
+                  fat
+                }
+            }
+          }
+        }
+        `,
+      },
+      {
+        headers: {
+          //'Content-type': 'application/json',
+          //prettier-ignore
+          "Authorization": `Token ${apiKey}`,
+          'sg-user': userId,
+        },
+      }
+    );
+    return results.data.recipeSwapOptions.similar;
+  }
+
   async getMealPlan(id) {
     const results = await this.post(
       '',
       {
         query: `{
-            mealPlan {
-              day
-              date(useDatetime: false)
+          mealPlan {
+            day
+            date(useDatetime: false)
+            calories
+            meals {
+              id
               calories
-              meals {
+              meal
+              numOfServings
+              recipe {
                 id
-                calories
-                meal
-                numOfServings
-                recipe {
-                  id
-                  databaseId
-                  name
-                  numberOfServings
-                  ingredientsCount
-                  ingredientLines
-                  courses
-                  cuisines
-                  mealTags
-                  source {
-                    recipeUrl
-                  }
-                  mainImage
-                  instructions
-                  totalTime
-                  nutrientsPerServing {
-                    calories
-                    sugar
-                    fiber
-                    protein
-                    carbs
-                    fat
-                  }
-                  caloriesPerServing {
-                    protein
-                    carbs
-                    fat
-                  }
+                databaseId
+                name
+                numberOfServings
+                ingredientsCount
+                ingredientLines
+                courses
+                cuisines
+                mealTags
+                source {
+                  recipeUrl
+                }
+                mainImage
+                instructions
+                totalTime
+                nutrientsPerServing {
+                  calories
+                  sugar
+                  fiber
+                  protein
+                  carbs
+                  fat
+                }
+                caloriesPerServing {
+                  protein
+                  carbs
+                  fat
                 }
               }
             }
-          }`,
+          }
+        }`,
       },
       {
         headers: {

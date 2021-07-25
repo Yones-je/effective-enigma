@@ -10,7 +10,7 @@ const typeDefs = gql`
     getMealPlanFromSuggestic(userId: ID!): [MealPlanSuggestic]
     getRecipeFromDb(id: ID!): Recipe
 
-    recipeSwapOptions(recipeId: ID!, serving: Int): [Recipe]
+    recipeSwapOptions(userId: ID!, recipeId: ID!): [Recipe]
     getAllSuggesticUsers: [User]
     getAllDbUsers: [User!]!
     LoginUserByEmail(email: String!, password: String!): LoginResponse
