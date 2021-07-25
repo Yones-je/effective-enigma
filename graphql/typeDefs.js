@@ -35,7 +35,7 @@ const typeDefs = gql`
     deleteUser(userId: ID!): SuccessResponse
 
     addRecipeToFavorites(recipeId: ID!, userId: ID!): SuccessMsgResponse
-    removeRecipeFromFavorites(recipeId: ID!, userID: ID!): SuccessMsgResponse
+    removeRecipeFromFavorites(recipeId: ID!, userId: ID!): SuccessMsgResponse
 
     swapMealPlanRecipe(recipeId: ID!, mealId: ID!, userId: ID!): MealPlan
 

@@ -206,7 +206,7 @@ module.exports.resolvers = {
     },
     addRecipeToFavorites: async (_, { recipeId, userId }) => {
       await User.findOneAndUpdate(
-        { id: userId },
+        { databaseId: userId },
         // prettier-ignore
         { "$push": { "favoriteRecipes": recipeId } }
       );
@@ -217,7 +217,7 @@ module.exports.resolvers = {
     },
     removeRecipeFromFavorites: async (_, { recipeId, userId }) => {
       await User.findOneAndUpdate(
-        { id: userId },
+        { databaseId: userId },
         { $pull: { favoriteRecipes: recipeId } }
       );
       return {
