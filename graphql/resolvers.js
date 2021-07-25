@@ -5,6 +5,7 @@ const { GraphQLScalarType } = require('graphql');
 const User = require('../db/models/userModel');
 const MealPlan = require('../db/models/mealPlanModel');
 const Recipe = require('../db/models/recipeModel');
+const Restriction = require('../db/models/restrictionModel');
 const { mongoLog, apiLog } = require('../utils/eventLogger');
 const extractRecipes = require('../utils/extractRecipes');
 const swapMeal = require('../utils/swapMeal');
@@ -142,10 +143,10 @@ module.exports.resolvers = {
         const existingMealPlan = await MealPlan.findOne({ id: userId });
         if (existingMealPlan) {
           await MealPlan.findOneAndUpdate({ id: userId }, { mealPlan });
-          mongoLog(`Updated mealplan in DB`);
+          mongoLog(`Updated mealplan in DB...`);
         } else if (!existingMealPlan) {
           await new MealPlan({ id: userId, mealPlan }).save();
-          mongoLog(`Saved mealplan to DB`);
+          mongoLog(`Saved mealplan to DB...`);
         }
         const recipes = extractRecipes(mealPlan);
         const dbRecipes = await Recipe.find({}, 'id');
@@ -196,7 +197,7 @@ module.exports.resolvers = {
           await User.findOneAndUpdate({ databaseId: userId }, update, {
             new: true,
           });
-          mongoLog(`Updated user ${userId}`);
+          mongoLog(`Updated user ${userId}...`);
         }
         return updatedUser;
       } catch (err) {
@@ -205,6 +206,7 @@ module.exports.resolvers = {
       }
     },
     addRecipeToFavorites: async (_, { recipeId, userId }) => {
+      mongoLog(`Adding favorite...`);
       await User.findOneAndUpdate(
         { databaseId: userId },
         // prettier-ignore
@@ -216,6 +218,7 @@ module.exports.resolvers = {
       };
     },
     removeRecipeFromFavorites: async (_, { recipeId, userId }) => {
+      mongoLog(`Removing favorite...`);
       await User.findOneAndUpdate(
         { databaseId: userId },
         { $pull: { favoriteRecipes: recipeId } }
@@ -224,6 +227,33 @@ module.exports.resolvers = {
         success: true,
         message: `Removed recipe: ${recipeId} from user: ${userId}'s favorites`,
       };
+    },
+
+    addRestriction: async (_, { id, name, subcategory, slugname }) => {
+      mongoLog(`Adding restriction ${name}...`);
+      await new Restriction({ id, name, subcategory, slugname }).save();
+      return {
+        success: true,
+      };
+    },
+
+    profileRestrictionsUpdate: async (
+      _,
+      { userId, restrictions },
+      { dataSources }
+    ) => {
+      const user = await User.findOneAndUpdate(
+        { databaseId: userId },
+        { restrictions },
+        { new: true }
+      );
+      console.log(user.restrictions);
+      apiLog('Updating user food restrictions...');
+
+      return await dataSources.suggesticAPI.profileRestrictionsUpdate(
+        userId,
+        user.restrictions
+      );
     },
 
     swapMealPlanRecipe: async (

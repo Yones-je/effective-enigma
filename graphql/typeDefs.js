@@ -30,6 +30,18 @@ const typeDefs = gql`
       snackDistribution: Float
     ): SuccessMsgResponse
 
+    addRestriction(
+      id: ID!
+      name: String!
+      subcategory: String!
+      slugname: String!
+    ): SuccessResponse
+
+    profileRestrictionsUpdate(
+      userId: ID!
+      restrictions: [String]!
+    ): SuccessResponse
+
     createUser(name: String!, email: String!, password: String!): UserResponse
 
     deleteUser(userId: ID!): SuccessResponse
@@ -84,8 +96,17 @@ const typeDefs = gql`
     name: String
     email: String
     password: String
+    favoriteRecipes: [ID]
+    restrictions: [String]
     profile: Profile
     mealplanId: ID
+  }
+
+  type Restriction {
+    id: String
+    name: String
+    subcategory: String
+    slugname: String
   }
 
   type Profile {

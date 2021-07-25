@@ -157,6 +157,31 @@ class SuggesticSource extends RESTDataSource {
     );
     return results.data.swapMealPlanRecipe;
   }
+
+  async profileRestrictionsUpdate(userId, restrictions) {
+    const results = await this.post(
+      '',
+      {
+        query: `mutation {
+        profileRestrictionsUpdate(
+          restrictions: ${JSON.stringify(restrictions)}
+        ) {
+          success
+        }
+      }`,
+      },
+      {
+        headers: {
+          //'Content-type': 'application/json',
+          Authorization: `Token ${apiKey}`,
+          'sg-user': userId,
+        },
+      }
+    );
+
+    return results.data.profileRestrictionsUpdate;
+  }
+
   async generateMealPlan(userId, mealPlanOptions) {
     const results = await this.post(
       '',
