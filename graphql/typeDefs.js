@@ -13,7 +13,7 @@ const typeDefs = gql`
     recipeSwapOptions(userId: ID!, recipeId: ID!): [Recipe]
     getAllSuggesticUsers: [User]
     getAllDbUsers: [User!]!
-    LoginUserByEmail(email: String!, password: String!): LoginResponse
+    LoginUserByEmail(email: String!, password: String!): UserResponse
   }
 
   # MUTATIONS
@@ -28,18 +28,16 @@ const typeDefs = gql`
       lunchDistribution: Float
       dinnerDistribution: Float
       snackDistribution: Float
-    ): GenerateMealPlanResponse
+    ): SuccessMsgResponse
 
-    createUser(
-      name: String!
-      email: String!
-      password: String!
-    ): CreateUserResponse
+    createUser(name: String!, email: String!, password: String!): UserResponse
 
-    deleteUser(userId: ID!): DeleteUserResponse
+    deleteUser(userId: ID!): SuccessResponse
 
-    addRecipeToFavorites(recipeId: ID!, userId: ID!): FavoriteResponse
-    removeRecipeFromFavorites(recipeId: ID!, userID: ID!): FavoriteResponse
+    addRecipeToFavorites(recipeId: ID!, userId: ID!): SuccessMsgResponse
+    removeRecipeFromFavorites(recipeId: ID!, userID: ID!): SuccessMsgResponse
+
+    swapMealPlanRecipe(recipeId: ID!, mealId: ID!, userId: ID!): MealPlan
 
     # Creates AND updates profile
     updateUserProfile(
@@ -57,18 +55,12 @@ const typeDefs = gql`
 
   # RESPONSES
 
-  type LoginResponse {
-    success: Boolean
-    message: String
-    user: User
-  }
-
-  type FavoriteResponse {
+  type SuccessMsgResponse {
     success: Boolean
     message: String
   }
 
-  type CreateUserResponse {
+  type UserResponse {
     success: Boolean
     message: String
     user: User
@@ -82,13 +74,8 @@ const typeDefs = gql`
     bmr: Int
   }
 
-  type DeleteUserResponse {
+  type SuccessResponse {
     success: Boolean
-  }
-
-  type GenerateMealPlanResponse {
-    success: Boolean
-    message: String
   }
 
   # TYPES

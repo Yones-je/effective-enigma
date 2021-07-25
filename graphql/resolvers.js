@@ -7,6 +7,7 @@ const MealPlan = require('../db/models/mealPlanModel');
 const Recipe = require('../db/models/recipeModel');
 const { mongoLog, apiLog } = require('../utils/eventLogger');
 const extractRecipes = require('../utils/extractRecipes');
+const swapMeal = require('../utils/swapMeal');
 dotenv.config({ path: '../.env' });
 
 const dateScalar = new GraphQLScalarType({
@@ -223,6 +224,41 @@ module.exports.resolvers = {
         success: true,
         message: `Removed recipe: ${recipeId} from user: ${userId}'s favorites`,
       };
+    },
+
+    swapMealPlanRecipe: async (
+      _,
+      { recipeId, mealId, userId },
+      { dataSources }
+    ) => {
+      apiLog(`Swapping meal...`);
+      const suggesticSwap = await dataSources.suggesticAPI.swapMealPlanRecipe(
+        recipeId,
+        mealId,
+        userId
+      );
+
+      if (suggesticSwap.success) {
+        mongoLog(`Fetching user's meal plan...`);
+        const mealPlan = await MealPlan.findOne({ id: userId });
+
+        mongoLog(`Fetching recipe...`);
+        const newRecipe = await Recipe.findOne({ id: recipeId });
+
+        mongoLog(`Swapping...`);
+        const newPlan = swapMeal(mealPlan.mealPlan, newRecipe, mealId);
+
+        mongoLog(`Updating meal plan...`);
+        const newDbPlan = await MealPlan.findOneAndUpdate(
+          { id: userId },
+          { mealPlan: newPlan },
+          {
+            new: true,
+          }
+        );
+        return newDbPlan;
+      }
+      return;
     },
   },
 };

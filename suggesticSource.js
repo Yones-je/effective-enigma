@@ -133,7 +133,30 @@ class SuggesticSource extends RESTDataSource {
     apiLog('Retrieved all users');
     return results.data.users.edges.map(el => el.node);
   }
-
+  async swapMealPlanRecipe(recipeId, mealId, userId) {
+    const results = await this.post(
+      '',
+      {
+        query: `mutation {
+         swapMealPlanRecipe(
+           recipeId: "${recipeId}"
+           mealId: "${mealId}"
+         ) {
+           success
+         }
+       }`,
+      },
+      {
+        headers: {
+          'Content-type': 'application/json',
+          // prettier-ignore
+          'Authorization': `Token ${apiKey}`,
+          'sg-user': userId,
+        },
+      }
+    );
+    return results.data.swapMealPlanRecipe;
+  }
   async generateMealPlan(userId, mealPlanOptions) {
     const results = await this.post(
       '',
@@ -165,7 +188,6 @@ class SuggesticSource extends RESTDataSource {
     } else {
       apiLog(`Created meal plan for ${userId}`);
     }
-
     return results.data.generateMealPlan;
   }
 
