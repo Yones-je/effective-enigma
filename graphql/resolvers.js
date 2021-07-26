@@ -26,17 +26,14 @@ module.exports.resolvers = {
     },
 
     getMealPlanFromDb: async (_, { userId }) => {
-      const mealplan = await MealPlan.findOne({ id: userId });
-      // console.log(mealplan);
-      return mealplan;
+      return await MealPlan.findOne({ id: userId });
     },
 
     getAllSuggesticUsers: (_, __, { dataSources }) => {
       return dataSources.suggesticAPI.getAllUsers();
     },
     getAllDbUsers: async (_, __) => {
-      const users = await User.find();
-      return users;
+      return await User.find();
     },
     LoginUserByEmail: async (_, { email, password }) => {
       const user = await User.findOne({ email });
@@ -44,13 +41,13 @@ module.exports.resolvers = {
         return { success: false, message: 'No account with that email exists' };
 
       const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid)
+      if (!isValid) {
         return { success: false, message: 'Email or Password is incorrect.' };
+      }
       return { success: true, message: 'Welcome in', user };
     },
     getRecipeFromDb: async (_, { id }) => {
-      const recipe = await Recipe.findOne({ id });
-      return recipe;
+      return await Recipe.findOne({ id });
     },
     recipeSwapOptions: async (_, { userId, recipeId }, { dataSources }) => {
       const swappedRecipes = await dataSources.suggesticAPI.recipeSwapOptions(
@@ -65,6 +62,12 @@ module.exports.resolvers = {
         }
       });
       return swappedRecipes;
+    },
+    getAllRestrictions: async (_, __) => {
+      return await Restriction.find({});
+    },
+    getRecipesByIds: async (_, { ids }) => {
+      return await Recipe.find({ id: { $in: ids } });
     },
   },
   Mutation: {

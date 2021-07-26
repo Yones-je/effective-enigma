@@ -9,7 +9,8 @@ const typeDefs = gql`
     getMealPlanFromDb(userId: ID!): MealPlan
     getMealPlanFromSuggestic(userId: ID!): [MealPlanSuggestic]
     getRecipeFromDb(id: ID!): Recipe
-
+    getRecipesByIds(ids: [ID!]!): [Recipe]
+    getAllRestrictions: [Restriction]
     recipeSwapOptions(userId: ID!, recipeId: ID!): [Recipe]
     getAllSuggesticUsers: [User]
     getAllDbUsers: [User!]!
